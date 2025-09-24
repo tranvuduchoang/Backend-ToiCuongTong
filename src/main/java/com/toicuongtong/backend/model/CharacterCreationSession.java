@@ -1,12 +1,11 @@
 package com.toicuongtong.backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.util.Map;
 
 @Entity
 @Table(name = "character_creation_sessions", schema = "tct")
@@ -15,15 +14,14 @@ import java.util.Map;
 public class CharacterCreationSession {
 
     @Id
-    @Column(name = "player_id")
-    private Long playerId;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "session_data", columnDefinition = "jsonb")
-    private Map<String, Object> sessionData;
+    @Column(name = "session_data", columnDefinition = "TEXT")
+    private String sessionData;
 
-    public CharacterCreationSession(Long playerId, Map<String, Object> sessionData) {
-        this.playerId = playerId;
+    public CharacterCreationSession(Long userId, String sessionData) {
+        this.userId = userId;
         this.sessionData = sessionData;
     }
 }
