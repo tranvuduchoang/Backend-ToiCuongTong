@@ -11,7 +11,6 @@ import com.toicuongtong.backend.dto.AuthResponse;
 import com.toicuongtong.backend.dto.LoginRequest; // Thêm import này
 import com.toicuongtong.backend.dto.RegisterRequest;
 import com.toicuongtong.backend.model.User;
-import com.toicuongtong.backend.repository.PlayerRepository;
 import com.toicuongtong.backend.repository.UserRepository;
 import com.toicuongtong.backend.security.JwtUtil;
 
@@ -24,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PlayerRepository playerRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil; // Thêm công cụ tạo token
@@ -40,7 +38,7 @@ public class AuthService {
         user.setEmail(request.email());
         user.setDisplayName(request.displayName());
         user.setPasswordHash(encodedPassword);
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
         
         // KHÔNG tạo Player ngay khi đăng ký
         // Player sẽ được tạo sau khi user chọn avatar và công pháp trong trang create-character

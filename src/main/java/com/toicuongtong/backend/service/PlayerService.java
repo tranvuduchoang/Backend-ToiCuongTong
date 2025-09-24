@@ -12,7 +12,6 @@ import com.toicuongtong.backend.model.Player;
 import com.toicuongtong.backend.model.PlayerTechnique;
 import com.toicuongtong.backend.model.Technique;
 import com.toicuongtong.backend.model.User;
-import com.toicuongtong.backend.repository.CharacterCreationSessionRepository;
 import com.toicuongtong.backend.repository.PlayerRepository;
 import com.toicuongtong.backend.repository.PlayerTechniqueRepository;
 import com.toicuongtong.backend.repository.TechniqueRepository;
@@ -27,7 +26,6 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final TechniqueRepository techniqueRepository;
     private final PlayerTechniqueRepository playerTechniqueRepository;
-    private final CharacterCreationSessionRepository sessionRepository;
     private final UserRepository userRepository;
 
     public boolean getCharacterCreationStatus(Long userId) {
