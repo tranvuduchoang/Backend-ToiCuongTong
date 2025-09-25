@@ -28,7 +28,16 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            System.out.println("JwtUtil: Extracting username from token");
+            String username = extractClaim(token, Claims::getSubject);
+            System.out.println("JwtUtil: Extracted username: " + username);
+            return username;
+        } catch (Exception e) {
+            System.out.println("JwtUtil: Error extracting username: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -37,8 +46,17 @@ public class JwtUtil {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        try {
+            final String username = extractUsername(token);
+            boolean usernameMatch = username.equals(userDetails.getUsername());
+            boolean notExpired = !isTokenExpired(token);
+            System.out.println("JwtUtil: Token validation - username: " + username + ", userDetails: " + userDetails.getUsername() + ", match: " + usernameMatch + ", notExpired: " + notExpired);
+            return usernameMatch && notExpired;
+        } catch (Exception e) {
+            System.out.println("JwtUtil: Error validating token: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {

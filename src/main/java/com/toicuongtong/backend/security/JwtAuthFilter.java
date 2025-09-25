@@ -49,21 +49,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             System.out.println("JwtAuthFilter: Loading user details for: " + userEmail);
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            System.out.println("JwtAuthFilter: User details loaded: " + userDetails.getUsername());
-            
-            if (jwtUtil.isTokenValid(jwt, userDetails)) {
-                System.out.println("JwtAuthFilter: Token is valid, setting authentication");
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            } else {
-                System.out.println("JwtAuthFilter: Token is invalid");
+            try {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                System.out.println("JwtAuthFilter: User details loaded: " + userDetails.getUsername());
+                
+                if (jwtUtil.isTokenValid(jwt, userDetails)) {
+                    System.out.println("JwtAuthFilter: Token is valid, setting authentication");
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    System.out.println("JwtAuthFilter: Authentication set successfully");
+                } else {
+                    System.out.println("JwtAuthFilter: Token is invalid");
+                }
+            } catch (Exception e) {
+                System.out.println("JwtAuthFilter: Error loading user details: " + e.getMessage());
+                e.printStackTrace();
             }
+        } else {
+            System.out.println("JwtAuthFilter: userEmail is null or authentication already exists");
         }
         filterChain.doFilter(request, response);
     }

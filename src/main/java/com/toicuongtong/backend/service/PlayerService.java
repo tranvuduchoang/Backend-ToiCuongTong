@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.toicuongtong.backend.dto.CreateCharacterRequest;
+import com.toicuongtong.backend.dto.PlayerDTO;
 import com.toicuongtong.backend.model.Player;
 import com.toicuongtong.backend.model.PlayerTechnique;
 import com.toicuongtong.backend.model.Technique;
@@ -34,6 +35,35 @@ public class PlayerService {
             return false; // Chưa có Player nghĩa là chưa tạo nhân vật
         }
         return player.isCharacterCreated();
+    }
+
+    public PlayerDTO getPlayerData(Long userId) {
+        System.out.println("PlayerService: getPlayerData called for user ID: " + userId);
+        try {
+            var playerOpt = playerRepository.findByUserId(userId);
+            if (playerOpt.isPresent()) {
+                Player player = playerOpt.get();
+                System.out.println("PlayerService: Player found - ID: " + player.getId() + ", Name: " + player.getName());
+                
+                // Convert Player to PlayerDTO
+                PlayerDTO playerDTO = new PlayerDTO();
+                playerDTO.setId(player.getId());
+                playerDTO.setName(player.getName());
+                playerDTO.setAvatarUrl(player.getAvatarUrl());
+                playerDTO.setCharacterCreated(player.isCharacterCreated());
+                playerDTO.setStats(player.getStats());
+                playerDTO.setUserId(player.getUser().getId()); // Lấy user ID thay vì toàn bộ user object
+                
+                return playerDTO;
+            } else {
+                System.out.println("PlayerService: No player found for user ID: " + userId);
+                throw new RuntimeException("Không tìm thấy thông tin nhân vật");
+            }
+        } catch (Exception e) {
+            System.out.println("PlayerService: Error in getPlayerData: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional
