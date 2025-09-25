@@ -3,6 +3,7 @@ package com.toicuongtong.backend.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,30 @@ public class PlayerService {
                 playerDTO.setStats(player.getStats());
                 playerDTO.setUserId(player.getUser().getId()); // Lấy user ID thay vì toàn bộ user object
                 
+                // Thêm các trường mới
+                playerDTO.setCurrentRealmId(player.getCurrentRealmId());
+                playerDTO.setCurrentSublevel(player.getCurrentSublevel());
+                playerDTO.setExperience(player.getExperience());
+                playerDTO.setMaxExperience(player.getMaxExperience());
+                playerDTO.setSpiritStones(player.getSpiritStones());
+                playerDTO.setGold(player.getGold());
+                playerDTO.setReputation(player.getReputation());
+                playerDTO.setCurrentStamina(player.getCurrentStamina());
+                playerDTO.setMaxStamina(player.getMaxStamina());
+                
+                // Tính toán cultivation level và realm
+                if (player.getCurrentRealmId() != null) {
+                    // Lấy tên realm từ database hoặc hardcode
+                    String[] realmNames = {"Luyện Thể", "Luyện Khí", "Trúc Cơ", "Kết Đan", "Nguyên Anh", "Hóa Thần"};
+                    if (player.getCurrentRealmId() <= realmNames.length) {
+                        playerDTO.setCultivationLevel(realmNames[player.getCurrentRealmId() - 1]);
+                    }
+                } else {
+                    playerDTO.setCultivationLevel("Luyện Thể");
+                }
+                
+                playerDTO.setCultivationRealm("Tầng " + Objects.requireNonNullElse(player.getCurrentSublevel(), 1));
+                
                 return playerDTO;
             } else {
                 System.out.println("PlayerService: No player found for user ID: " + userId);
@@ -61,7 +86,7 @@ public class PlayerService {
             }
         } catch (Exception e) {
             System.out.println("PlayerService: Error in getPlayerData: " + e.getMessage());
-            e.printStackTrace();
+            // Log error for debugging - consider using proper logging framework
             throw e;
         }
     }
@@ -141,5 +166,70 @@ public class PlayerService {
         // sessionRepository.deleteById(savedPlayer.getId());
 
         return savedPlayer;
+    }
+    
+    /**
+     * Lấy player theo ID
+     */
+    public Player getPlayerById(Long playerId) {
+        return playerRepository.findById(playerId).orElse(null);
+    }
+    
+    /**
+     * Cập nhật player
+     */
+    public Player updatePlayer(Player player) {
+        return playerRepository.save(player);
+    }
+    
+    /**
+     * Hồi phục stamina theo thời gian
+     */
+    public void recoverStamina(Long playerId) {
+        Player player = getPlayerById(playerId);
+        if (player == null) return;
+        
+        // Basic stamina recovery for UI testing
+        // Recover 10 stamina per call (can be called every few minutes)
+        int recoveryAmount = 10;
+        int newStamina = Math.min(player.getMaxStamina(), player.getCurrentStamina() + recoveryAmount);
+        player.setCurrentStamina(newStamina);
+        updatePlayer(player);
+        
+        System.out.println("Player " + player.getName() + " recovered " + recoveryAmount + " stamina. Current: " + newStamina);
+    }
+    
+    /**
+     * Kiểm tra và xử lý level up
+     */
+    public boolean checkAndProcessLevelUp(Long playerId) {
+        Player player = getPlayerById(playerId);
+        if (player == null) return false;
+        
+        // Basic level up logic for UI testing
+        int currentExp = player.getExperience();
+        int maxExp = player.getMaxExperience();
+        
+        if (currentExp >= maxExp) {
+            // Level up!
+            player.setExperience(currentExp - maxExp);
+            player.setCurrentSublevel(player.getCurrentSublevel() + 1);
+            player.setMaxStamina(player.getMaxStamina() + 10); // Increase max stamina
+            player.setCurrentStamina(player.getMaxStamina()); // Full stamina on level up
+            
+            // Increase stats slightly
+            Map<String, Object> stats = player.getStats();
+            if (stats != null) {
+                stats.put("STR", (Integer) stats.getOrDefault("STR", 10) + 1);
+                stats.put("AGI", (Integer) stats.getOrDefault("AGI", 10) + 1);
+                stats.put("DEF", (Integer) stats.getOrDefault("DEF", 10) + 1);
+            }
+            
+            updatePlayer(player);
+            System.out.println("Player " + player.getName() + " leveled up to sublevel " + player.getCurrentSublevel());
+            return true;
+        }
+        
+        return false;
     }
 }

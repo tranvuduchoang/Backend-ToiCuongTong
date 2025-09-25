@@ -54,4 +54,32 @@ public class Player {
 
     @Column(name = "character_created")
     private boolean isCharacterCreated = false;
+    
+    // Thêm các trường mới cho Combat System
+    @Column(name = "current_realm_id")
+    private Integer currentRealmId;
+    
+    @Column(name = "current_sublevel")
+    private Integer currentSublevel;
+    
+    @Column(name = "experience")
+    private Integer experience;
+    
+    @Column(name = "max_experience")
+    private Integer maxExperience;
+    
+    @Column(name = "spirit_stones")
+    private Integer spiritStones;
+    
+    @Column(name = "gold")
+    private Integer gold;
+    
+    @Column(name = "reputation")
+    private Integer reputation;
+    
+    @Column(name = "current_stamina")
+    private Integer currentStamina;
+    
+    @Column(name = "max_stamina")
+    private Integer maxStamina;
 }

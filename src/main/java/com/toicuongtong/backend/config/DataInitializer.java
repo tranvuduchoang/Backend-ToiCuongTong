@@ -2,6 +2,7 @@
 package com.toicuongtong.backend.config;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 // @Component: Đánh dấu đây là một "linh kiện" của Spring, để Spring quản lý nó.
 @Component
+@ConditionalOnProperty(name = "app.data.initializer.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j // Lombok: Tự động tạo một logger để chúng ta có thể in thông báo ra console.
 public class DataInitializer implements CommandLineRunner {

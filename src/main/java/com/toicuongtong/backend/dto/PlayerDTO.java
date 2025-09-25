@@ -16,4 +16,17 @@ public class PlayerDTO {
     private boolean characterCreated; // Đổi tên để tránh vấn đề với Lombok
     private Map<String, Object> stats;
     private Long userId; // Thay vì trả về toàn bộ User object
+    
+    // Thêm các trường mới cho Combat System
+    private Integer currentRealmId;
+    private Integer currentSublevel;
+    private Integer experience;
+    private Integer maxExperience;
+    private Integer spiritStones;
+    private Integer gold;
+    private Integer reputation;
+    private Integer currentStamina;
+    private Integer maxStamina;
+    private String cultivationLevel;
+    private String cultivationRealm;
 }

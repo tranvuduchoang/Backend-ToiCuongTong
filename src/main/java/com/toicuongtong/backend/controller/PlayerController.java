@@ -50,7 +50,7 @@ public class PlayerController {
             return ResponseEntity.ok(playerDTO);
         } catch (Exception e) {
             System.out.println("PlayerController: Error getting player data: " + e.getMessage());
-            e.printStackTrace();
+            // Log error for debugging
             throw e;
         }
     }
