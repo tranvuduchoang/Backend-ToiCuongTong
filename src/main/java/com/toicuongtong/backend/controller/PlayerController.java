@@ -65,4 +65,19 @@ public class PlayerController {
         Player updatedPlayer = playerService.createCharacter(user.getId(), request);
         return ResponseEntity.ok(updatedPlayer);
     }
+
+    // API để cập nhật rewards sau combat
+    // POST http://localhost:8081/api/player/update-rewards
+    @PostMapping("/update-rewards")
+    public ResponseEntity<PlayerDTO> updateRewards(
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, Object> rewards) {
+        
+        System.out.println("=== PlayerController.updateRewards ===");
+        System.out.println("User ID: " + user.getId());
+        System.out.println("Rewards: " + rewards);
+        
+        PlayerDTO updatedPlayer = playerService.updateRewards(user.getId(), rewards);
+        return ResponseEntity.ok(updatedPlayer);
+    }
 }

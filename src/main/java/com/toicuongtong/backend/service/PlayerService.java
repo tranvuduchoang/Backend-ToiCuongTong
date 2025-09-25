@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class PlayerService {
     private final UserRepository userRepository;
 
     public boolean getCharacterCreationStatus(Long userId) {
-        Player player = playerRepository.findByUserId(userId).orElse(null);
+        Player player = playerRepository.findByUser_Id(userId).orElse(null);
         if (player == null) {
             return false; // Chưa có Player nghĩa là chưa tạo nhân vật
         }
@@ -41,7 +42,7 @@ public class PlayerService {
     public PlayerDTO getPlayerData(Long userId) {
         System.out.println("PlayerService: getPlayerData called for user ID: " + userId);
         try {
-            var playerOpt = playerRepository.findByUserId(userId);
+            var playerOpt = playerRepository.findByUser_Id(userId);
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
                 System.out.println("PlayerService: Player found - ID: " + player.getId() + ", Name: " + player.getName());
@@ -123,7 +124,7 @@ public class PlayerService {
         }
 
         // Kiểm tra xem Player đã tồn tại chưa
-        Player player = playerRepository.findByUserId(userId).orElse(null);
+        Player player = playerRepository.findByUser_Id(userId).orElse(null);
         
         if (player == null) {
             // Tạo Player mới nếu chưa tồn tại
@@ -231,5 +232,57 @@ public class PlayerService {
         }
         
         return false;
+    }
+    
+    /**
+     * Cập nhật rewards sau combat
+     */
+    public PlayerDTO updateRewards(Long userId, Map<String, Object> rewards) {
+        System.out.println("=== updateRewards called ===");
+        System.out.println("User ID: " + userId);
+        System.out.println("Rewards: " + rewards);
+        
+        // Tìm player theo user_id thay vì player_id
+        Optional<Player> playerOpt = playerRepository.findByUser_Id(userId);
+        if (playerOpt.isEmpty()) {
+            System.out.println("Player not found for user ID: " + userId);
+            return null;
+        }
+        
+        Player player = playerOpt.get();
+        
+        System.out.println("Found player ID: " + player.getId());
+        
+        System.out.println("Before update - Experience: " + player.getExperience() + ", Gold: " + player.getGold());
+        
+        // Update experience
+        if (rewards.containsKey("experience")) {
+            int expGain = (Integer) rewards.get("experience");
+            player.setExperience(player.getExperience() + expGain);
+            System.out.println("Added experience: " + expGain + ", New total: " + player.getExperience());
+        }
+        
+        // Update gold
+        if (rewards.containsKey("gold")) {
+            int goldGain = (Integer) rewards.get("gold");
+            player.setGold(player.getGold() + goldGain);
+            System.out.println("Added gold: " + goldGain + ", New total: " + player.getGold());
+        }
+        
+        // Update spirit stones
+        if (rewards.containsKey("spiritStones")) {
+            int stonesGain = (Integer) rewards.get("spiritStones");
+            player.setSpiritStones(player.getSpiritStones() + stonesGain);
+            System.out.println("Added spirit stones: " + stonesGain + ", New total: " + player.getSpiritStones());
+        }
+        
+        // Save updated player
+        Player savedPlayer = updatePlayer(player);
+        System.out.println("After save - Experience: " + savedPlayer.getExperience() + ", Gold: " + savedPlayer.getGold());
+        
+        // Return updated player data using the same user ID
+        PlayerDTO result = getPlayerData(userId);
+        System.out.println("Returned DTO - Experience: " + result.getExperience() + ", Gold: " + result.getGold());
+        return result;
     }
 }
