@@ -83,7 +83,8 @@ public class PlayerService {
                 return playerDTO;
             } else {
                 System.out.println("PlayerService: No player found for user ID: " + userId);
-                throw new RuntimeException("Không tìm thấy thông tin nhân vật");
+                // Trả về null thay vì ném exception để frontend có thể xử lý
+                return null;
             }
         } catch (Exception e) {
             System.out.println("PlayerService: Error in getPlayerData: " + e.getMessage());
@@ -134,6 +135,17 @@ public class PlayerService {
             player = new Player();
             player.setUser(user);
             player.setName(user.getDisplayName());
+            
+            // Khởi tạo các giá trị mặc định cho các trường bắt buộc
+            player.setCurrentRealmId(1); // Bắt đầu từ realm 1 (Luyện Thể)
+            player.setCurrentSublevel(1); // Bắt đầu từ sublevel 1
+            player.setExperience(0);
+            player.setMaxExperience(2000); // Exp cần để level up
+            player.setSpiritStones(0);
+            player.setGold(0);
+            player.setReputation(0);
+            player.setCurrentStamina(100);
+            player.setMaxStamina(100);
         }
 
         // Cập nhật thông tin nhân vật
